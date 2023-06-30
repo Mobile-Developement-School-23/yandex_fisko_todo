@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ToDoAppFisko</string>
+    <string name="Case">Дело</string>
+    <string name="Cancellation">Отмена</string>
+    <string name="Save">Сохранить</string>
+    <string name="PriorityHigh">!!</string>
+    <string name="show">Показать</string>
+    <string name="doneTask">Выполнено</string>
+    <string name="myBusiness"><b> Мои дела</b> </string>
+    <string name="priorytyNo">Нет</string>
+    <string name="makeTo">Сделать до</string>
+    <string name="importance">Важность</string>
+    <string name="action_search">Важность</string>
+    <string name="WhatNeedToDo">Что надо сделать ?</string>
+</resources>
