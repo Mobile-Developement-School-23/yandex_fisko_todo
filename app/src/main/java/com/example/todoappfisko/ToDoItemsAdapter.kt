@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.fisko.yandex.todoapp.inflate
+import com.example.todoappfisko.extensions.inflate
 
 class ToDoItemsAdapter(
     private val onItemRemoveListener: OnItemRemoveListener,

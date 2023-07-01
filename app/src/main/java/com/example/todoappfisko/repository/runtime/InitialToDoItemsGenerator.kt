@@ -1,7 +1,7 @@
-package com.fisko.yandex.todoapp
+package com.example.todoappfisko.repository.runtime
 
 import com.example.todoappfisko.ToDoItemFactory
-import com.example.todoappfisko.ToDoItemsImportance
+import com.example.todoappfisko.ToDoItemImportance
 import com.example.todoappfisko.TodoItem
 
 
@@ -22,7 +22,7 @@ class InitialToDoItemsGenerator {
     private fun generateItem(): TodoItem {
         return toDoItemFactory.create(
             TEXTS.random(),
-            ToDoItemsImportance.values().random(),
+            ToDoItemImportance.values().random(),
             BOOLEAN_VALUES.random()
         )
     }

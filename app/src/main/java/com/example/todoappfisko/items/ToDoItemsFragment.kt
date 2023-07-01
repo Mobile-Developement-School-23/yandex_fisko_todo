@@ -1,25 +1,32 @@
-package com.example.todoappfisko
+package com.example.todoappfisko.items
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todoappfisko.R
+import com.example.todoappfisko.ToDoItemsAdapter
+import com.example.todoappfisko.TodoItem
 import com.example.todoappfisko.databinding.FragmentItemListBinding
-import com.fisko.yandex.todoapp.TodoItemsRepository
-
+import com.example.todoappfisko.item.ItemViewerFragment
+import kotlinx.coroutines.launch
 
 class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
-    TodoItemsRepository.OnItemsChangeListener,
     ToDoItemsAdapter.OnItemClickListener,
     ToDoItemsAdapter.OnItemRemoveListener {
+
+    private val viewModel by viewModels<ToDoItemsViewModel>()
 
     private val toDoItemsAdapter = ToDoItemsAdapter(this, this)
 
     private var _binding: FragmentItemListBinding? = null
     private val binding get() = _binding!!
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,13 +34,17 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentItemListBinding.inflate(layoutInflater)
-        TodoItemsRepository.addItemsChangeListener(this)
         _binding?.let { initList(it) }
-        val todoItems = TodoItemsRepository.todoItems
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    toDoItemsAdapter.updateItems(state.items)
+                }
+            }
+        }
 
         binding.addFab.setOnClickListener { openAddItemScreen(null) }
-        toDoItemsAdapter.updateItems(todoItems)
-        toDoItemsAdapter.notifyItemRangeInserted(0, todoItems.size)
         return binding.root
     }
 
@@ -46,14 +57,8 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        TodoItemsRepository.removeItemsChangeListener(this)
-    }
-
     private fun openAddItemScreen(item: TodoItem?) {
-
-        childFragmentManager?.let {
+        parentFragmentManager?.let {
             it.beginTransaction()
                 .replace(R.id.container, ItemViewerFragment.newInstance(item?.id))
                 .addToBackStack("")
@@ -61,16 +66,12 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
         }
     }
 
-    override fun onItemsChange(items: List<TodoItem>) {
-        toDoItemsAdapter.updateItems(items)
-    }
-
     override fun onItemClicked(item: TodoItem) {
         openAddItemScreen(item)
     }
 
     override fun onItemRemoved(item: TodoItem) {
-        TodoItemsRepository.removeItem(item)
+        viewModel.removeItem(item)
     }
 
     override fun onDestroy() {

@@ -1,4 +1,4 @@
-package com.fisko.yandex.todoapp
+package com.example.todoappfisko.extensions
 
 import android.view.LayoutInflater
 import android.view.View
