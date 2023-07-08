@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TodoItemsRepository private constructor(
-    private val networkTodoItemsDataSource: NetworkTodoItemsDataSource = NetworkTodoItemsDataSource(),
-    private val runtimeTodoItemsDataSource: RuntimeTodoItemsDataSource = RuntimeTodoItemsDataSource(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+class TodoItemsRepository @Inject constructor(
+    private val networkTodoItemsDataSource: NetworkTodoItemsDataSource,
+    private val runtimeTodoItemsDataSource: RuntimeTodoItemsDataSource
 ) {
-
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
     private val _itemsUpdateFlow = MutableSharedFlow<Unit>(replay = 0)
 
     init {
@@ -79,7 +79,7 @@ class TodoItemsRepository private constructor(
 
         private const val ITEMS_REFRESH_INTERVAL = 8 * 60 * 60 * 1000L
 
-        private var instance: TodoItemsRepository? = null
+       lateinit var instance: TodoItemsRepository? = null
 
         fun getInstance(): TodoItemsRepository {
             if (instance == null)
@@ -87,5 +87,7 @@ class TodoItemsRepository private constructor(
 
             return instance!!
         }
+
+
     }
 }

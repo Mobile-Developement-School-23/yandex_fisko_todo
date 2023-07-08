@@ -1,5 +1,6 @@
 package com.example.todoappfisko.repository.network
 
+import dagger.Provides
 import okhttp3.Interceptor
 import okhttp3.Response
 

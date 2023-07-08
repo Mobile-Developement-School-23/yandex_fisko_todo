@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class ItemViewerViewModel(
@@ -41,11 +42,8 @@ class ItemViewerViewModel(
     fun addItem(newText: String, newImportance: ToDoItemImportance) {
         scope.launch {
             val item = _state.value.item
-            val updatedItem = if (item != null) {
-                item.copy(text = newText, importance = newImportance)
-            } else {
-                toDoItemFactory.create(newText, newImportance, false)
-            }
+            val updatedItem = item?.copy(text = newText, importance = newImportance)
+                ?: toDoItemFactory.create(newText, newImportance, false)
 
             repository.addItem(updatedItem)
         }

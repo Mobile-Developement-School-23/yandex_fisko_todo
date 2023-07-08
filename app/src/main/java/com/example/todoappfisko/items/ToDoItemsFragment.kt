@@ -16,6 +16,7 @@ import com.example.todoappfisko.TodoItem
 import com.example.todoappfisko.databinding.FragmentItemListBinding
 import com.example.todoappfisko.item.ItemViewerFragment
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
     ToDoItemsAdapter.OnItemClickListener,
@@ -23,7 +24,7 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
 
     private val viewModel by viewModels<ToDoItemsViewModel>()
 
-    private val toDoItemsAdapter = ToDoItemsAdapter(this, this)
+    private val toDoItemsAdapter: ToDoItemsAdapter = ToDoItemsAdapter(this, this)
 
     private var _binding: FragmentItemListBinding? = null
     private val binding get() = _binding!!

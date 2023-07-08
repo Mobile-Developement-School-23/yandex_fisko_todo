@@ -5,8 +5,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoappfisko.extensions.inflate
+import javax.inject.Inject
 
-class ToDoItemsAdapter(
+class ToDoItemsAdapter @Inject constructor(
     private val onItemRemoveListener: OnItemRemoveListener,
     private val onItemClickedListener: OnItemClickListener
 ) : RecyclerView.Adapter<ToDoItemsAdapter.Holder>() {
@@ -34,7 +35,7 @@ class ToDoItemsAdapter(
         notifyDataSetChanged()
     }
 
-    class Holder(
+    class Holder @Inject constructor(
         view: View,
         private val onItemRemoveListener: OnItemRemoveListener,
         private val onItemClickedListener: OnItemClickListener
@@ -56,7 +57,6 @@ class ToDoItemsAdapter(
     interface OnItemClickListener {
         fun onItemClicked(item: TodoItem)
     }
-
     interface OnItemRemoveListener {
         fun onItemRemoved(item: TodoItem)
     }

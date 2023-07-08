@@ -3,6 +3,8 @@ package com.example.todoappfisko.repository
 import com.example.todoappfisko.TodoItem
 import com.example.todoappfisko.repository.model.RequestResult
 import com.example.todoappfisko.repository.model.RequestStatus
+import dagger.Component
+import javax.inject.Inject
 
 interface TodoItemsDataSource {
 

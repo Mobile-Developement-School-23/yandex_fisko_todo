@@ -2,18 +2,18 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
-
+    id 'kotlin-kapt'
 }
 
 android {
     namespace 'com.example.todoappfisko'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         manifestPlaceholders = [YANDEX_CLIENT_ID:"a38ea7bc3c69404a923ba0b4b173bc0e"]
         applicationId "com.example.todoappfisko"
-        minSdk 24
-        targetSdk 33
+        minSdk 26
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -27,11 +27,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true
@@ -69,7 +69,8 @@ dependencies {
     implementation "com.google.code.gson:gson:2.10.1"
 
     // dagger2
-    implementation "com.google.dagger:dagger:2.45"
+    implementation 'com.google.dagger:dagger:2.45'
+    kapt 'com.google.dagger:dagger-compiler:2.45'
 
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
