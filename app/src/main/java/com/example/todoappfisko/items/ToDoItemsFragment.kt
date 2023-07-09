@@ -10,6 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todoappfisko.MainActivity
+import com.example.todoappfisko.MyApplication
 import com.example.todoappfisko.R
 import com.example.todoappfisko.ToDoItemsAdapter
 import com.example.todoappfisko.TodoItem
@@ -22,7 +24,8 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
     ToDoItemsAdapter.OnItemClickListener,
     ToDoItemsAdapter.OnItemRemoveListener {
 
-    private val viewModel by viewModels<ToDoItemsViewModel>()
+    @Inject
+    lateinit var viewModel: ToDoItemsViewModel
 
     private val toDoItemsAdapter: ToDoItemsAdapter = ToDoItemsAdapter(this, this)
 
@@ -34,6 +37,8 @@ class ToDoItemsFragment : Fragment(R.layout.fragment_item_list),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        (activity as MainActivity).registrationComponent.inject(this)
+
         _binding = FragmentItemListBinding.inflate(layoutInflater)
         _binding?.let { initList(it) }
 

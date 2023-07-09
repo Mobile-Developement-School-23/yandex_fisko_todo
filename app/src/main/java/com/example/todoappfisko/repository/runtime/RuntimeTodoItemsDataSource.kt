@@ -8,8 +8,10 @@ import com.example.todoappfisko.repository.model.RequestResult
 import com.example.todoappfisko.repository.model.RequestStatus
 import com.example.todoappfisko.repository.model.SuccessRequestResult
 import com.example.todoappfisko.repository.model.SuccessRequestStatus
+import javax.inject.Inject
 
-class RuntimeTodoItemsDataSource : TodoItemsDataSource {
+class RuntimeTodoItemsDataSource @Inject constructor(
+) : TodoItemsDataSource {
 
     private val toDoItemsGenerator: InitialToDoItemsGenerator = InitialToDoItemsGenerator()
     private val mutableToDoItems = toDoItemsGenerator.generate().toMutableList()

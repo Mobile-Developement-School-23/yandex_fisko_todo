@@ -1,8 +1,8 @@
 package com.example.todoappfisko
 
 import android.app.Application
-import com.example.android.dagger.di.DaggerAppComponent
 import com.example.todoappfisko.di.AppComponent
+import com.example.todoappfisko.di.DaggerAppComponent
 
 open class MyApplication : Application() {
 
@@ -11,9 +11,7 @@ open class MyApplication : Application() {
         initializeComponent()
     }
 
-    open fun initializeComponent(): AppComponent {
-        // Creates an instance of AppComponent using its Factory constructor
-        // We pass the applicationContext that will be used as Context in the graph
+    private fun initializeComponent(): AppComponent {
         return DaggerAppComponent.factory().create(applicationContext)
     }
 }

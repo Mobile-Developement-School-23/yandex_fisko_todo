@@ -15,12 +15,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class ItemViewerViewModel(
-    private val repository: TodoItemsRepository = TodoItemsRepository.getInstance(),
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val toDoItemFactory: ToDoItemFactory = ToDoItemFactory()
+class ItemViewerViewModel @Inject constructor(
+    private val repository: TodoItemsRepository,
+    private val toDoItemFactory: ToDoItemFactory
 ) : ViewModel() {
-
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
     private val _state = MutableStateFlow(ToDoItemState())
     val state: StateFlow<ToDoItemState> = _state.asStateFlow()
 

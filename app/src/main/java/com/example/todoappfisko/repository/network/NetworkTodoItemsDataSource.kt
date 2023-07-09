@@ -10,10 +10,13 @@ import com.example.todoappfisko.repository.model.RequestStatus
 import com.example.todoappfisko.repository.model.SuccessRequestResult
 import com.example.todoappfisko.repository.model.SuccessRequestStatus
 import java.util.Date
+import javax.inject.Inject
 
-class NetworkTodoItemsDataSource(
-    private val service: BackendService = BackendRetrofitClient.client.create(BackendService::class.java)
+class NetworkTodoItemsDataSource @Inject constructor(
 ) : TodoItemsDataSource {
+
+    private val service: BackendService =
+        BackendRetrofitClient.client.create(BackendService::class.java)
 
     private var revision: Int = 0
 

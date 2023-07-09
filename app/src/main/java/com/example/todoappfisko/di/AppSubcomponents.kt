@@ -9,10 +9,5 @@ import com.example.todoappfisko.repository.TodoItemsRepository
 import dagger.Module
 
 // This module tells a Component which are its subcomponents
-@Module(
-    subcomponents = [
-//        ToDoItemsViewModel::class
-
-    ]
-)
+@Module
 class AppSubcomponents

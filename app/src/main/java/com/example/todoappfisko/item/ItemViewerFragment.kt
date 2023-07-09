@@ -10,22 +10,24 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.todoappfisko.MainActivity
 import com.example.todoappfisko.ToDoItemImportance
 import com.example.todoappfisko.TodoItem
 import com.example.todoappfisko.databinding.FragmentAddTaskBinding
 import com.example.todoappfisko.extensions.withArguments
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 class ItemViewerFragment : Fragment() {
 
-    private val viewModel by viewModels<ItemViewerViewModel>()
+    @Inject
+    lateinit var viewModel: ItemViewerViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        (activity as MainActivity).registrationComponent.inject(this)
+
         val binding = FragmentAddTaskBinding.inflate(inflater, container, false)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -74,9 +76,7 @@ class ItemViewerFragment : Fragment() {
 
         val importanceSpinner = binding.importanceSpinner
         importanceSpinner.adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            ToDoItemImportance.values()
+            requireContext(), android.R.layout.simple_spinner_item, ToDoItemImportance.values()
         )
         importanceSpinner.setSelection(importance.ordinal)
     }

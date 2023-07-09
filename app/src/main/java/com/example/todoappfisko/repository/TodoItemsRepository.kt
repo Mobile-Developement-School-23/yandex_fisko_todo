@@ -74,20 +74,4 @@ class TodoItemsRepository @Inject constructor(
         _itemsUpdateFlow.emit(Unit)
         return runtimeTodoItemsDataSource.removeItem(item)
     }
-
-    companion object {
-
-        private const val ITEMS_REFRESH_INTERVAL = 8 * 60 * 60 * 1000L
-
-       lateinit var instance: TodoItemsRepository? = null
-
-        fun getInstance(): TodoItemsRepository {
-            if (instance == null)
-                instance = TodoItemsRepository()
-
-            return instance!!
-        }
-
-
-    }
 }
