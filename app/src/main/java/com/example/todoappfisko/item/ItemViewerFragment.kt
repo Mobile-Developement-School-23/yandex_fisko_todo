@@ -5,14 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.todoappfisko.MainActivity
 import com.example.todoappfisko.ToDoItemImportance
 import com.example.todoappfisko.TodoItem
+import com.example.todoappfisko.compose.DefaultPreview
 import com.example.todoappfisko.databinding.FragmentAddTaskBinding
 import com.example.todoappfisko.extensions.withArguments
 import kotlinx.coroutines.launch
@@ -65,7 +66,12 @@ class ItemViewerFragment : Fragment() {
 
             fragmentManager?.popBackStack()
         }
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DefaultPreview()
+            }
+//        return binding.root
+        }
     }
 
     private fun initialization(binding: FragmentAddTaskBinding, item: TodoItem?) {
