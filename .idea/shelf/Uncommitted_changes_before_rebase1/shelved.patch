@@ -1,0 +1,459 @@
+Index: app/src/main/java/com/example/todoappfisko/item/ItemViewerFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.todoappfisko.item\r\n\r\nimport android.os.Bundle\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ArrayAdapter\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.fragment.app.viewModels\r\nimport androidx.lifecycle.Lifecycle\r\nimport androidx.lifecycle.lifecycleScope\r\nimport androidx.lifecycle.repeatOnLifecycle\r\nimport com.example.todoappfisko.MainActivity\r\nimport com.example.todoappfisko.ToDoItemImportance\r\nimport com.example.todoappfisko.TodoItem\r\nimport com.example.todoappfisko.databinding.FragmentAddTaskBinding\r\nimport com.example.todoappfisko.extensions.withArguments\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\nclass ItemViewerFragment : Fragment() {\r\n\r\n    @Inject\r\n    lateinit var viewModel: ItemViewerViewModel\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?\r\n    ): View {\r\n        (activity as MainActivity).registrationComponent.inject(this)\r\n\r\n        val binding = FragmentAddTaskBinding.inflate(inflater, container, false)\r\n\r\n        viewLifecycleOwner.lifecycleScope.launch {\r\n            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {\r\n                viewModel.state.collect { state ->\r\n                    val item = state.item\r\n                    initialization(binding, item)\r\n                }\r\n            }\r\n        }\r\n\r\n        val itemId = savedInstanceState?.getString(BUNDLE_KEY_ID)\r\n        if (itemId != null) {\r\n            viewModel.initialize(itemId)\r\n        }\r\n\r\n        binding.calendarView.visibility = View.GONE\r\n        binding.switch1.setOnCheckedChangeListener { _, isCheked ->\r\n            binding.calendarView.visibility = if (isCheked) View.VISIBLE else View.GONE\r\n        }\r\n        binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->\r\n            binding.dataFinish.text = \"$dayOfMonth.${month + 1}.$year\"\r\n        }\r\n        binding.buttonCancel.setOnClickListener {\r\n            fragmentManager?.popBackStack()\r\n        }\r\n\r\n        binding.buttonSave.setOnClickListener {\r\n            val newText = binding.itemText.text.toString()\r\n\r\n            val importancePosition = binding.importanceSpinner.selectedItemPosition\r\n            val newImportance = ToDoItemImportance.values()[importancePosition]\r\n\r\n            viewModel.addItem(newText, newImportance)\r\n\r\n            fragmentManager?.popBackStack()\r\n        }\r\n        return binding.root\r\n    }\r\n\r\n    private fun initialization(binding: FragmentAddTaskBinding, item: TodoItem?) {\r\n        val text = item?.text ?: \"\"\r\n        val importance = item?.importance ?: ToDoItemImportance.Normal\r\n\r\n        binding.itemText.setText(text)\r\n\r\n        val importanceSpinner = binding.importanceSpinner\r\n        importanceSpinner.adapter = ArrayAdapter(\r\n            requireContext(), android.R.layout.simple_spinner_item, ToDoItemImportance.values()\r\n        )\r\n        importanceSpinner.setSelection(importance.ordinal)\r\n    }\r\n\r\n    companion object {\r\n        private const val BUNDLE_KEY_ID = \"id\"\r\n        fun newInstance(bundleKeyId: String?): ItemViewerFragment {\r\n            return ItemViewerFragment().withArguments {\r\n                putString(BUNDLE_KEY_ID, bundleKeyId)\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/item/ItemViewerFragment.kt b/app/src/main/java/com/example/todoappfisko/item/ItemViewerFragment.kt
+--- a/app/src/main/java/com/example/todoappfisko/item/ItemViewerFragment.kt	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/src/main/java/com/example/todoappfisko/item/ItemViewerFragment.kt	(date 1689440260474)
+@@ -5,8 +5,36 @@
+ import android.view.View
+ import android.view.ViewGroup
+ import android.widget.ArrayAdapter
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.width
++import androidx.compose.material.DropdownMenuItem
++import androidx.compose.material.Switch
++import androidx.compose.material3.Button
++import androidx.compose.material3.DropdownMenu
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextField
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.platform.ComposeView
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
+ import androidx.fragment.app.Fragment
+-import androidx.fragment.app.viewModels
+ import androidx.lifecycle.Lifecycle
+ import androidx.lifecycle.lifecycleScope
+ import androidx.lifecycle.repeatOnLifecycle
+@@ -17,6 +45,9 @@
+ import com.example.todoappfisko.extensions.withArguments
+ import kotlinx.coroutines.launch
+ import javax.inject.Inject
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.setValue
++import com.example.todoappfisko.compose.DefaultPreview
+ 
+ class ItemViewerFragment : Fragment() {
+ 
+@@ -27,7 +58,6 @@
+         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+     ): View {
+         (activity as MainActivity).registrationComponent.inject(this)
+-
+         val binding = FragmentAddTaskBinding.inflate(inflater, container, false)
+ 
+         viewLifecycleOwner.lifecycleScope.launch {
+@@ -65,7 +95,12 @@
+ 
+             fragmentManager?.popBackStack()
+         }
+-        return binding.root
++//        return binding.root
++        return ComposeView(requireContext()).apply {
++            setContent {
++                DefaultPreview()
++            }
++        }
+     }
+ 
+     private fun initialization(binding: FragmentAddTaskBinding, item: TodoItem?) {
+@@ -89,4 +124,4 @@
+             }
+         }
+     }
+-}
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/todoappfisko/di/StorageModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.todoappfisko.di\r\n\r\nimport dagger.Module\r\n\r\n// Tells Dagger this is a Dagger module\r\n@Module\r\nabstract class StorageModule\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/di/StorageModule.kt b/app/src/main/java/com/example/todoappfisko/di/StorageModule.kt
+--- a/app/src/main/java/com/example/todoappfisko/di/StorageModule.kt	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/src/main/java/com/example/todoappfisko/di/StorageModule.kt	(date 1689440260454)
+@@ -2,6 +2,5 @@
+ 
+ import dagger.Module
+ 
+-// Tells Dagger this is a Dagger module
+ @Module
+ abstract class StorageModule
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    id 'com.android.application'\r\n    id 'org.jetbrains.kotlin.android'\r\n    id 'kotlin-parcelize'\r\n    id 'kotlin-kapt'\r\n}\r\n\r\nandroid {\r\n    namespace 'com.example.todoappfisko'\r\n    compileSdk 34\r\n\r\n    defaultConfig {\r\n        manifestPlaceholders = [YANDEX_CLIENT_ID:\"a38ea7bc3c69404a923ba0b4b173bc0e\"]\r\n        applicationId \"com.example.todoappfisko\"\r\n        minSdk 26\r\n        targetSdk 34\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_17\r\n        targetCompatibility = JavaVersion.VERSION_17\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = '17'\r\n    }\r\n    buildFeatures {\r\n        viewBinding true\r\n    }\r\n}\r\n\r\ndependencies {\r\n\r\n    implementation 'androidx.core:core-ktx:1.10.1'\r\n    implementation 'androidx.appcompat:appcompat:1.6.1'\r\n    implementation 'com.google.android.material:material:1.9.0'\r\n    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'\r\n    implementation 'androidx.legacy:legacy-support-v4:1.0.0'\r\n    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'\r\n    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'\r\n    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'\r\n    implementation 'androidx.fragment:fragment-ktx:1.6.0'\r\n    testImplementation 'junit:junit:4.13.2'\r\n    androidTestImplementation 'androidx.test.ext:junit:1.1.5'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'\r\n\r\n    implementation \"androidx.coordinatorlayout:coordinatorlayout:1.2.0\"\r\n\r\n    //yandex\r\n    implementation \"com.yandex.android:authsdk:2.5.1\"\r\n\r\n    // room\r\n    implementation(\"androidx.room:room-runtime:2.5.2\")\r\n    implementation \"androidx.room:room-ktx:2.5.2\"\r\n    //\r\n    // okhttp3\r\n    implementation 'com.squareup.okhttp3:okhttp:4.10.0'\r\n\r\n    // gson\r\n    implementation \"com.google.code.gson:gson:2.10.1\"\r\n\r\n    // dagger2\r\n    implementation 'com.google.dagger:dagger:2.45'\r\n    kapt 'com.google.dagger:dagger-compiler:2.45'\r\n\r\n    // coroutines\r\n    implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4\")\r\n\r\n\r\n    // Retrofit\r\n    implementation \"com.squareup.okhttp3:logging-interceptor:4.10.0\"\r\n    implementation \"org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0\"\r\n    implementation \"com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0\"\r\n\r\n    implementation 'com.squareup.retrofit2:retrofit:2.9.0'\r\n    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/build.gradle	(date 1689440260414)
+@@ -36,6 +36,16 @@
+     buildFeatures {
+         viewBinding true
+     }
++    buildFeatures {
++        compose true
++    }
++
++
++
++    composeOptions {
++        kotlinCompilerExtensionVersion = "1.4.6"
++        kotlinCompilerVersion '1.8.20'
++    }
+ }
+ 
+ dependencies {
+@@ -74,7 +84,32 @@
+ 
+     // coroutines
+     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
++//    room
++    def room_version = "2.5.2"
++
++    implementation("androidx.room:room-runtime:$room_version")
++    annotationProcessor("androidx.room:room-compiler:$room_version")
++
++    // To use Kotlin annotation processing tool (kapt)
++    kapt("androidx.room:room-compiler:$room_version")
++
++    // optional - Kotlin Extensions and Coroutines support for Room
++    implementation("androidx.room:room-ktx:$room_version")
+ 
++    // optional - RxJava2 support for Room
++    implementation("androidx.room:room-rxjava2:$room_version")
++
++    // optional - RxJava3 support for Room
++    implementation("androidx.room:room-rxjava3:$room_version")
++
++    // optional - Guava support for Room, including Optional and ListenableFuture
++    implementation("androidx.room:room-guava:$room_version")
++
++    // optional - Test helpers
++    testImplementation("androidx.room:room-testing:$room_version")
++
++    // optional - Paging 3 Integration
++    implementation("androidx.room:room-paging:$room_version")
+ 
+     // Retrofit
+     implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+@@ -83,4 +118,47 @@
+ 
+     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
++
++    //compose
++    def composeBom = platform('androidx.compose:compose-bom:2023.05.01')
++    implementation composeBom
++    androidTestImplementation composeBom
++
++    implementation 'com.github.mateusz800:Expandable-Compose-Calendar:ce5075e1d4'
++    // Choose one of the following:
++    // Material Design 3
++    implementation 'androidx.compose.material3:material3'
++    // or Material Design 2
++    implementation 'androidx.compose.material:material'
++    // or skip Material Design and build directly on top of foundational components
++    implementation 'androidx.compose.foundation:foundation'
++    // or only import the main APIs for the underlying toolkit systems,
++    // such as input and measurement/layout
++    implementation 'androidx.compose.ui:ui'
++
++    // Android Studio Preview support
++    implementation 'androidx.compose.ui:ui-tooling-preview'
++    debugImplementation 'androidx.compose.ui:ui-tooling'
++
++    // UI Tests
++    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
++    debugImplementation 'androidx.compose.ui:ui-test-manifest'
++
++    // Optional - Included automatically by material, only add when you need
++    // the icons but not the material library (e.g. when using Material3 or a
++    // custom design system based on Foundation)
++    implementation 'androidx.compose.material:material-icons-core'
++    // Optional - Add full set of material icons
++    implementation 'androidx.compose.material:material-icons-extended'
++    // Optional - Add window size utils
++    implementation 'androidx.compose.material3:material3-window-size-class'
++
++    // Optional - Integration with activities
++    implementation 'androidx.activity:activity-compose:1.7.2'
++    // Optional - Integration with ViewModels
++    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
++    // Optional - Integration with LiveData
++    implementation 'androidx.compose.runtime:runtime-livedata'
++    // Optional - Integration with RxJava
++    implementation 'androidx.compose.runtime:runtime-rxjava2'
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/todoappfisko/compose/PromptGenerateScreen.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/compose/PromptGenerateScreen.kt b/app/src/main/java/com/example/todoappfisko/compose/PromptGenerateScreen.kt
+new file mode 100644
+--- /dev/null	
++++ b/app/src/main/java/com/example/todoappfisko/compose/PromptGenerateScreen.kt	
+@@ -0,0 +1,166 @@
++package com.example.todoappfisko.compose
++
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.heightIn
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.width
++import androidx.compose.material.DropdownMenuItem
++import androidx.compose.material.Switch
++import androidx.compose.material3.Button
++import androidx.compose.material3.DropdownMenu
++import androidx.compose.material3.Text
++import androidx.compose.material3.TextField
++import androidx.compose.material3.TextFieldDefaults
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
++
++@Composable
++fun MainActivity() {
++    Column(
++        modifier = Modifier
++            .fillMaxSize()
++            .padding(16.dp),
++        verticalArrangement = Arrangement.Center
++    ) {
++        Row(
++            modifier = Modifier.fillMaxWidth(),
++            horizontalArrangement = Arrangement.Center
++        ) {
++            Button(
++                onClick = {
++
++
++                }
++            ) {
++                Text("Сохранить")
++            }
++            Text(
++                text = "Дело",
++                fontSize = 26.sp
++            )
++            Spacer(modifier = Modifier.width(6.dp))
++            Button(
++                onClick = { /* обработка клика на вторую кнопку */ }
++            ) {
++                Text("Отмена")
++            }
++        }
++        Spacer(modifier = Modifier.height(16.dp))
++        EditText()
++        Spacer(modifier = Modifier.height(16.dp))
++        Text("Важность")
++        Dropdown()
++        Spacer(modifier = Modifier.height(16.dp))
++        Text("Установить дату:")
++        SwitchWithCalendar()
++        Spacer(modifier = Modifier.height(16.dp))
++        Button(
++            onClick = { /* обработка клика на кнопку "Удалить" */ },
++            modifier = Modifier
++                .fillMaxWidth()
++                .align(Alignment.CenterHorizontally)
++        ) {
++            Text("Удалить")
++        }
++    }
++}
++
++
++@Composable
++fun EditText() {
++    TextField(
++        value = "",
++        modifier = Modifier
++            .fillMaxWidth(),
++        onValueChange = {  },
++        label = { Text("Введите текст") },
++        maxLines = 3
++    )
++}
++
++
++@Composable
++fun Dropdown() {
++    val options = listOf("Low", "Normal", "Urgent")
++    var selectedIndex by remember { mutableStateOf(0) }
++
++    Box(modifier = Modifier.background(Color.LightGray)) {
++        Text(
++            modifier = Modifier
++                .fillMaxWidth()
++                .padding(horizontal = 16.dp, vertical = 8.dp),
++            text = options[selectedIndex]
++        )
++        DropdownMenu(
++            modifier = Modifier.fillMaxWidth(),
++            expanded = false,
++            onDismissRequest = {},
++        ) {
++            options.forEachIndexed { index, option ->
++                DropdownMenuItem(
++                    onClick = {
++                        selectedIndex = index
++                    }
++                ) {
++                    Text(text = option)
++                }
++            }
++        }
++    }
++}
++
++@Composable
++fun SwitchWithCalendar() {
++    var isSwitchChecked by remember { mutableStateOf(false) }
++    val selectedDate = remember { mutableStateOf("") }
++    val isCalendarVisible = remember { mutableStateOf(false) }
++
++    Row(verticalAlignment = Alignment.CenterVertically) {
++        Switch(checked = isSwitchChecked, onCheckedChange = { isSwitchChecked = it })
++        Text(
++            modifier = Modifier.padding(start = 8.dp),
++            text = "Открыть календарь"
++        )
++    }
++
++    if (isSwitchChecked) {
++        Row(verticalAlignment = Alignment.CenterVertically) {
++            Button(
++                onClick = {
++                    isCalendarVisible.value = true
++                },
++                modifier = Modifier.padding(top = 8.dp)
++            ) {
++                Text("Выбрать дату")
++            }
++            Spacer(modifier = Modifier.width(8.dp))
++            Text(selectedDate.value, modifier = Modifier.padding(top = 8.dp))
++        }
++        if (isCalendarVisible.value) {
++            // Код для отображения календаря
++        }
++    }
++}
++
++@Preview(showBackground = true)
++@Composable
++fun DefaultPreview() {
++    MainActivity()
++}
+Index: app/src/main/java/com/example/todoappfisko/items/ToDoItemsFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.todoappfisko.items\r\n\r\nimport android.os.Bundle\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.fragment.app.viewModels\r\nimport androidx.lifecycle.Lifecycle\r\nimport androidx.lifecycle.lifecycleScope\r\nimport androidx.lifecycle.repeatOnLifecycle\r\nimport androidx.recyclerview.widget.LinearLayoutManager\r\nimport com.example.todoappfisko.MainActivity\r\nimport com.example.todoappfisko.MyApplication\r\nimport com.example.todoappfisko.R\r\nimport com.example.todoappfisko.ToDoItemsAdapter\r\nimport com.example.todoappfisko.TodoItem\r\nimport com.example.todoappfisko.databinding.FragmentItemListBinding\r\nimport com.example.todoappfisko.item.ItemViewerFragment\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\nclass ToDoItemsFragment : Fragment(R.layout.fragment_item_list),\r\n    ToDoItemsAdapter.OnItemClickListener,\r\n    ToDoItemsAdapter.OnItemRemoveListener {\r\n\r\n    @Inject\r\n    lateinit var viewModel: ToDoItemsViewModel\r\n\r\n    private val toDoItemsAdapter: ToDoItemsAdapter = ToDoItemsAdapter(this, this)\r\n\r\n    private var _binding: FragmentItemListBinding? = null\r\n    private val binding get() = _binding!!\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater,\r\n        container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View {\r\n        (activity as MainActivity).registrationComponent.inject(this)\r\n\r\n        _binding = FragmentItemListBinding.inflate(layoutInflater)\r\n        _binding?.let { initList(it) }\r\n\r\n        viewLifecycleOwner.lifecycleScope.launch {\r\n            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {\r\n                viewModel.state.collect { state ->\r\n                    toDoItemsAdapter.updateItems(state.items)\r\n                }\r\n            }\r\n        }\r\n\r\n        binding.addFab.setOnClickListener { openAddItemScreen(null) }\r\n        return binding.root\r\n    }\r\n\r\n    private fun initList(binding: FragmentItemListBinding) {\r\n        with(binding.toDoList) {\r\n            adapter = toDoItemsAdapter\r\n            layoutManager = LinearLayoutManager(requireContext())\r\n            setHasFixedSize(true)\r\n        }\r\n\r\n    }\r\n\r\n    private fun openAddItemScreen(item: TodoItem?) {\r\n        parentFragmentManager?.let {\r\n            it.beginTransaction()\r\n                .replace(R.id.container, ItemViewerFragment.newInstance(item?.id))\r\n                .addToBackStack(\"\")\r\n                .commit()\r\n        }\r\n    }\r\n\r\n    override fun onItemClicked(item: TodoItem) {\r\n        openAddItemScreen(item)\r\n    }\r\n\r\n    override fun onItemRemoved(item: TodoItem) {\r\n        viewModel.removeItem(item)\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        _binding = null\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/items/ToDoItemsFragment.kt b/app/src/main/java/com/example/todoappfisko/items/ToDoItemsFragment.kt
+--- a/app/src/main/java/com/example/todoappfisko/items/ToDoItemsFragment.kt	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/src/main/java/com/example/todoappfisko/items/ToDoItemsFragment.kt	(date 1689440260494)
+@@ -5,13 +5,11 @@
+ import android.view.View
+ import android.view.ViewGroup
+ import androidx.fragment.app.Fragment
+-import androidx.fragment.app.viewModels
+ import androidx.lifecycle.Lifecycle
+ import androidx.lifecycle.lifecycleScope
+ import androidx.lifecycle.repeatOnLifecycle
+ import androidx.recyclerview.widget.LinearLayoutManager
+ import com.example.todoappfisko.MainActivity
+-import com.example.todoappfisko.MyApplication
+ import com.example.todoappfisko.R
+ import com.example.todoappfisko.ToDoItemsAdapter
+ import com.example.todoappfisko.TodoItem
+@@ -49,7 +47,6 @@
+                 }
+             }
+         }
+-
+         binding.addFab.setOnClickListener { openAddItemScreen(null) }
+         return binding.root
+     }
+Index: app/src/main/java/com/example/todoappfisko/di/AppComponent.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.todoappfisko.di\r\n\r\nimport android.content.Context\r\nimport dagger.BindsInstance\r\nimport dagger.Component\r\nimport javax.inject.Singleton\r\n\r\n// Scope annotation that the AppComponent uses\r\n// Classes annotated with @Singleton will have a unique instance in this Component\r\n@Singleton\r\n// Definition of a Dagger component that adds info from the different modules to the graph\r\n@Component(modules = [StorageModule::class, AppSubcomponents::class])\r\ninterface AppComponent {\r\n\r\n    // Factory to create instances of the AppComponent\r\n    @Component.Factory\r\n    interface Factory {\r\n        // With @BindsInstance, the Context passed in will be available in the graph\r\n        fun create(@BindsInstance context: Context): AppComponent\r\n    }\r\n\r\n    // Types that can be retrieved from the graph\r\n    fun registrationComponent(): RegistrationComponent.Factory\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/di/AppComponent.kt b/app/src/main/java/com/example/todoappfisko/di/AppComponent.kt
+--- a/app/src/main/java/com/example/todoappfisko/di/AppComponent.kt	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/src/main/java/com/example/todoappfisko/di/AppComponent.kt	(date 1689440260414)
+@@ -12,13 +12,11 @@
+ @Component(modules = [StorageModule::class, AppSubcomponents::class])
+ interface AppComponent {
+ 
+-    // Factory to create instances of the AppComponent
+     @Component.Factory
+     interface Factory {
+         // With @BindsInstance, the Context passed in will be available in the graph
+         fun create(@BindsInstance context: Context): AppComponent
+     }
+ 
+-    // Types that can be retrieved from the graph
+     fun registrationComponent(): RegistrationComponent.Factory
+ }
+Index: app/src/main/java/com/example/todoappfisko/di/AppSubcomponents.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.todoappfisko.di\r\n\r\nimport com.example.todoappfisko.MainActivity\r\nimport com.example.todoappfisko.ToDoItemsAdapter\r\nimport com.example.todoappfisko.item.ItemViewerViewModel\r\nimport com.example.todoappfisko.items.ToDoItemsFragment\r\nimport com.example.todoappfisko.items.ToDoItemsViewModel\r\nimport com.example.todoappfisko.repository.TodoItemsRepository\r\nimport dagger.Module\r\n\r\n// This module tells a Component which are its subcomponents\r\n@Module\r\nclass AppSubcomponents\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/todoappfisko/di/AppSubcomponents.kt b/app/src/main/java/com/example/todoappfisko/di/AppSubcomponents.kt
+--- a/app/src/main/java/com/example/todoappfisko/di/AppSubcomponents.kt	(revision 82ee33f2f91d3ac6e6cc9b03d861478db1ea0535)
++++ b/app/src/main/java/com/example/todoappfisko/di/AppSubcomponents.kt	(date 1689440260434)
+@@ -8,6 +8,5 @@
+ import com.example.todoappfisko.repository.TodoItemsRepository
+ import dagger.Module
+ 
+-// This module tells a Component which are its subcomponents
+ @Module
+ class AppSubcomponents
